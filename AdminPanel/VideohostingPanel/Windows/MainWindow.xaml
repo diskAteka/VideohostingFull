@@ -1,0 +1,397 @@
+﻿<Window x:Class="VideohostingPanel.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VideohostingPanel"
+        Title="Видеохостинг - Панель управления"
+        MinWidth="1200"
+        MinHeight="800"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStyle="None"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/VideohostingPanel;component/Classes/Other/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Конвертер для видимости в зависимости от роли (заглушка) -->
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+            <!-- Стиль для кнопок сортировки с CornerRadius -->
+            <Style x:Key="SortButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="40"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DarkTertiaryBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <!-- Основной фон -->
+        <Grid.Background>
+            <RadialGradientBrush Center="0.8,0.2" RadiusX="1.2" RadiusY="1.2">
+                <GradientStop Color="#2D0B4A" Offset="0"/>
+                <GradientStop Color="#0A0A0A" Offset="1"/>
+            </RadialGradientBrush>
+        </Grid.Background>
+
+        <!-- Декоративный паттерн -->
+        <Rectangle Opacity="0.02">
+            <Rectangle.Fill>
+                <DrawingBrush Viewport="0,0,20,20" ViewportUnits="Absolute" TileMode="Tile">
+                    <DrawingBrush.Drawing>
+                        <GeometryDrawing Brush="White">
+                            <GeometryDrawing.Geometry>
+                                <GeometryGroup>
+                                    <LineGeometry StartPoint="0,0" EndPoint="20,20"/>
+                                    <LineGeometry StartPoint="20,0" EndPoint="0,20"/>
+                                </GeometryGroup>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingBrush.Drawing>
+                </DrawingBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Верхняя панель -->
+            <Border Grid.Row="0"
+                    Background="{StaticResource DarkSecondaryBrush}"
+                    CornerRadius="15"
+                    BorderBrush="{StaticResource PrimaryPurpleBrush}"
+                    BorderThickness="1"
+                    Margin="0,0,0,10"
+                    Opacity="0.95">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Логотип -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="20,15">
+                        <TextBlock Text="ВидеоХостинг" 
+                                  FontSize="20" 
+                                  FontWeight="Bold"
+                                  Foreground="{StaticResource PrimaryRedBrush}"/>
+                        <TextBlock Text="Admin" 
+                                  FontSize="16" 
+                                  Margin="10,0,0,0"
+                                  Foreground="{StaticResource PrimaryPurpleBrush}"/>
+                    </StackPanel>
+
+                    <!-- Информация о пользователе -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="20,15">
+                        <TextBlock x:Name="UserNameText" 
+                                  Text="Администратор" 
+                                  FontSize="16"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  VerticalAlignment="Center"/>
+
+                        <!-- Кнопка выхода -->
+                        <Button x:Name="LogoutButton"
+                                Width="35"
+                                Height="35"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Margin="15,0,0,0"
+                                Cursor="Hand"
+                                Click="LogoutButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            CornerRadius="17.5">
+                                        <Path Data="M5,5 L20,20 M20,5 L5,20"
+                                              Stroke="{StaticResource PrimaryRedBrush}"
+                                              StrokeThickness="2"
+                                              Width="15"
+                                              Height="15"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Кнопка закрытия -->
+                        <Button x:Name="CloseButton"
+                                Width="35"
+                                Height="35"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Margin="5,0,0,0"
+                                Cursor="Hand"
+                                Click="CloseButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            CornerRadius="17.5">
+                                        <Path Data="M0,0 L15,15 M15,0 L0,15"
+                                              Stroke="White"
+                                              StrokeThickness="2"
+                                              Width="15"
+                                              Height="15"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Основной контент -->
+            <Border Grid.Row="1"
+                    Background="{StaticResource DarkSecondaryBrush}"
+                    CornerRadius="15"
+                    BorderBrush="{StaticResource PrimaryPurpleBrush}"
+                    BorderThickness="1"
+                    Opacity="0.95">
+                <Grid>
+                    <!-- Панель администратора -->
+                    <Grid x:Name="AdminPanel" Visibility="Visible">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Панель выбора таблицы -->
+                        <Border Grid.Row="0"
+                                Background="{StaticResource DarkTertiaryBrush}"
+                                CornerRadius="15,15,0,0"
+                                Padding="20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="300"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="Таблица:"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,20,0"/>
+
+                                <ComboBox x:Name="TablesComboBox"
+                                          Grid.Column="1"
+                                          Selected="LoadElements"
+                                          Style="{StaticResource BaseComboBoxStyle}"
+                                          SelectedIndex="0">
+                                    <ComboBoxItem Content="Video"/>
+                                    <ComboBoxItem Content="User"/>
+                                    <ComboBoxItem Content="ServerLog"/>
+                                    <ComboBoxItem Content="Comment"/>
+                                    <ComboBoxItem Content="Like"/>
+                                    <ComboBoxItem Content="DisLike"/>
+                                    <ComboBoxItem Content="View"/>
+                                    <ComboBoxItem Content="Emploee"/>
+                                </ComboBox>
+
+                                <!-- Поиск по ID -->
+                                <Border Grid.Column="2"
+                                        Background="{StaticResource DarkSecondaryBrush}"
+                                        CornerRadius="14"
+                                        BorderBrush="{StaticResource PrimaryPurpleBrush}"
+                                        BorderThickness="1"
+                                        Margin="20,0,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Text="ID:"
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0,5,0"/>
+
+                                        <TextBox x:Name="SearchIdTextBox"
+                                                 Grid.Column="1"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                                 FontSize="14"
+                                                 VerticalAlignment="Center"
+                                                 Padding="5,0"
+                                                 MaxLength="10"/>
+
+                                        <Button x:Name="SearchByIdButton"
+                                                Click="SearchById"
+                                                Grid.Column="2"
+                                                Content="Найти"
+                                                Style="{StaticResource BaseButtonStyle}"
+                                                Height="35"
+                                                Width="70"
+                                                Margin="0,0,5,0"
+                                                FontSize="12"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Кнопки сортировки -->
+                                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                    <TextBlock Text="Сортировка:"
+                                               FontSize="14"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,10,0"/>
+
+                                    <Button x:Name="SortAscButton"
+                                            Style="{StaticResource SortButtonStyle}"
+                                            Margin="0,0,5,0"
+                                            Click="SortAscButton_Click">
+                                        <Path Data="M0,5 L10,5 L5,0 L0,5"
+                                              Fill="{StaticResource PrimaryPurpleBrush}"
+                                              Width="12"
+                                              Height="12"/>
+                                    </Button>
+
+                                    <Button x:Name="SortDescButton"
+                                            Style="{StaticResource SortButtonStyle}"
+                                            Click="SortDescButton_Click">
+                                        <Path Data="M0,0 L10,0 L5,5 L0,0"
+                                              Fill="{StaticResource PrimaryPurpleBrush}"
+                                              Width="12"
+                                              Height="12"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Контейнер для записей -->
+                        <Border Grid.Row="1"
+                                Background="Transparent"
+                                Margin="0">
+                            <ScrollViewer Style="{StaticResource BaseScrollViewerStyle}"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel x:Name="ItemsContainer" 
+                                            Style="{StaticResource ItemsStackPanelStyle}"/>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- Нижняя панель с информацией -->
+                        <Border Grid.Row="2"
+                                Background="{StaticResource DarkTertiaryBrush}"
+                                CornerRadius="0,0,15,15"
+                                Padding="20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Кнопка предыдущих записей -->
+                                <Button Grid.Column="0"
+                                        Click="PreviousRecords"
+                                        x:Name="LoadPreviousButton"
+                                        Content="Предыдущие 10 записей"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        Background="{StaticResource DarkBackgroundBrush}"
+                                        Height="40"
+                                        Width="250"
+                                        FontSize="14"
+                                        Margin="0,0,20,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Margin="10,0,10,0"
+                                           x:Name="PageCount" 
+                                           Text="Страница 1"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="14"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                                    <TextBlock Margin="10,0,10,0"
+                                           x:Name="ItemsCountText"
+                                           Text="Всего записей: 0"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="14"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+
+                                <!-- Кнопка следующих записей -->
+                                <Button Grid.Column="2"
+                                        Click="NextRecords"
+                                        x:Name="LoadMoreButton"
+                                        Content="Следующие 10 записей"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        Background="{StaticResource DarkBackgroundBrush}"
+                                        Height="40"
+                                        Width="250"
+                                        FontSize="14"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- Панель верификатора -->
+                    <Grid x:Name="VerifierPanel" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Заголовок -->
+                        <Border Grid.Row="0"
+                                Background="{StaticResource HeaderGradient}"
+                                CornerRadius="15,15,0,0"
+                                Padding="20">
+                            <TextBlock Text="Неверифицированные видео"
+                                       FontSize="24"
+                                       FontWeight="Bold"
+                                       Foreground="White"/>
+                        </Border>
+
+                        <!-- Список видео -->
+                        <Border Grid.Row="1"
+                                Background="Transparent"
+                                Margin="0">
+                            <ScrollViewer Style="{StaticResource BaseScrollViewerStyle}"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel x:Name="UnverifiedVideosContainer" 
+                                            Style="{StaticResource ItemsStackPanelStyle}"/>
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

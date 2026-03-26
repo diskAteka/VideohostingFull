@@ -1,0 +1,4 @@
+2026/03/26 10:17:07 [warn] 8860#9272: the "listen ... http2" directive is deprecated, use the "http2" directive instead in C:\Users\Дмитрий\Desktop\Курсовой проект. Рабочая копия\MyVideo\NginX/conf/nginx.conf:32
+2026/03/26 10:17:07 [emerg] 8860#9272: cannot load certificate "C:\Users\Дмитрий\Desktop\Курсовой проект. Рабочая копия\MyVideo\NginX/conf/ssl/localhost.crt": BIO_new_file() failed (SSL: error:80000003:system library::No such process:calling fopen(C:\Users\Дмитрий\Desktop\Курсовой проект. Рабочая копия\MyVideo\NginX/conf/ssl/localhost.crt, r) error:10000080:BIO routines::no such file)
+2026/03/26 10:26:28 [emerg] 10664#21396: cannot load certificate "C:\KP\MyVideo\Nginx/conf/ssl/localhost.crt": BIO_new_file() failed (SSL: error:80000003:system library::No such process:calling fopen(C:\KP\MyVideo\Nginx/conf/ssl/localhost.crt, r) error:10000080:BIO routines::no such file)
+2026/03/26 10:31:28 [notice] 21496#8852: signal process started

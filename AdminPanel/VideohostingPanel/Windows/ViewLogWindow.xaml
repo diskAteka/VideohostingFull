@@ -1,0 +1,187 @@
+﻿<Window x:Class="VideohostingPanel.Windows.ViewLogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Просмотр записи лога"
+        WindowStartupLocation="CenterOwner"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStyle="None"
+        Owner="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/VideohostingPanel;component/Classes/Other/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <RadialGradientBrush Center="0.8,0.2" RadiusX="0.8" RadiusY="0.8">
+                <GradientStop Color="#2D0B4A" Offset="0"/>
+                <GradientStop Color="#0A0A0A" Offset="1"/>
+            </RadialGradientBrush>
+        </Grid.Background>
+
+        <Border Margin="20"
+                Background="{StaticResource DarkSecondaryBrush}"
+                CornerRadius="20"
+                BorderBrush="{StaticResource PrimaryPurpleBrush}"
+                BorderThickness="1">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Заголовок -->
+                <Border Grid.Row="0"
+                        Background="{StaticResource HeaderGradient}"
+                        CornerRadius="20,20,0,0"
+                        Height="70">
+                    <Grid>
+                        <TextBlock Text="Просмотр записи лога"
+                                  FontSize="24"
+                                  FontWeight="Bold"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                        <Button x:Name="CloseButton"
+                                Width="30"
+                                Height="30"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Margin="0,0,20,0"
+                                Cursor="Hand">
+                            <Path Data="M0,0 L15,15 M15,0 L0,15"
+                                  Stroke="White"
+                                  StrokeThickness="2"
+                                  Width="12"
+                                  Height="12"/>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Детали лога -->
+                <ScrollViewer Grid.Row="1"
+                             Style="{StaticResource BaseScrollViewerStyle}"
+                             VerticalScrollBarVisibility="Auto"
+                             Margin="20">
+                    <StackPanel>
+
+                        <!-- ID -->
+                        <TextBlock Text="ID записи"
+                                  Style="{StaticResource SubHeaderStyle}"
+                                  Margin="0,0,0,5"
+                                  FontSize="12"/>
+                        <TextBox Text="1001"
+                                Style="{StaticResource BaseTextBoxStyle}"
+                                IsReadOnly="True"
+                                Background="{StaticResource DarkBackgroundBrush}"
+                                Margin="0,0,0,15"/>
+
+                        <!-- Пользователь -->
+                        <TextBlock Text="Пользователь"
+                                  Style="{StaticResource SubHeaderStyle}"
+                                  Margin="0,0,0,5"
+                                  FontSize="12"/>
+                        <TextBox Text="Иван Иванов (ID: 42)"
+                                Style="{StaticResource BaseTextBoxStyle}"
+                                IsReadOnly="True"
+                                Background="{StaticResource DarkBackgroundBrush}"
+                                Margin="0,0,0,15"/>
+
+                        <!-- Тип события -->
+                        <TextBlock Text="Тип события"
+                                  Style="{StaticResource SubHeaderStyle}"
+                                  Margin="0,0,0,5"
+                                  FontSize="12"/>
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                    Text="Вход в систему"
+                                    Style="{StaticResource BaseTextBoxStyle}"
+                                    IsReadOnly="True"
+                                    Background="{StaticResource DarkBackgroundBrush}"
+                                    Margin="0,0,10,0"/>
+                            <Border Grid.Column="1"
+                                    Background="#338A2BE2"
+                                    CornerRadius="10"
+                                    Padding="15,8"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="INFO"
+                                          FontSize="12"
+                                          FontWeight="Bold"
+                                          Foreground="#FFB794FF"/>
+                            </Border>
+                        </Grid>
+
+                        <!-- Дата и время -->
+                        <TextBlock Text="Дата и время"
+                                  Style="{StaticResource SubHeaderStyle}"
+                                  Margin="0,0,0,5"
+                                  FontSize="12"/>
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                    Text="15.03.2024"
+                                    Style="{StaticResource BaseTextBoxStyle}"
+                                    IsReadOnly="True"
+                                    Background="{StaticResource DarkBackgroundBrush}"
+                                    Margin="0,0,5,0"/>
+                            <TextBox Grid.Column="1"
+                                    Text="14:30:22"
+                                    Style="{StaticResource BaseTextBoxStyle}"
+                                    IsReadOnly="True"
+                                    Background="{StaticResource DarkBackgroundBrush}"
+                                    Margin="5,0,0,0"/>
+                        </Grid>
+
+                        <!-- Дополнительные данные (JSON) -->
+                        <TextBlock Text="Дополнительные данные"
+                                  Style="{StaticResource SubHeaderStyle}"
+                                  Margin="0,0,0,5"
+                                  FontSize="12"/>
+                        <Border Background="{StaticResource DarkBackgroundBrush}"
+                                CornerRadius="14"
+                                Padding="15"
+                                Margin="0,0,0,15">
+                            <TextBlock Text="{}{ 
+  'ip': '192.168.1.100',
+  'userAgent': 'Mozilla/5.0...',
+  'action': 'login_success'
+}"
+                                      FontFamily="Consolas"
+                                      FontSize="11"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Кнопка закрытия -->
+                <Border Grid.Row="2"
+                        Background="{StaticResource DarkTertiaryBrush}"
+                        CornerRadius="0,0,20,20"
+                        Padding="20">
+                    <Button Content="Закрыть"
+                           Style="{StaticResource BaseButtonStyle}"
+                           Background="{StaticResource DarkBackgroundBrush}"
+                           Width="150"
+                           HorizontalAlignment="Center"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
