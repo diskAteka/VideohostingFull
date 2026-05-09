@@ -1,6 +1,6 @@
 // config.js - подключается на всех страницах фронтенда
 window.API_CONFIG = {
-    BASE_URL: 'https://localhost:3001/api',
+    BASE_URL: '/api',
     ENDPOINTS: {
         // Аутентификация (обрабатывается главным сервером)
         REGISTER: '/auth/register',

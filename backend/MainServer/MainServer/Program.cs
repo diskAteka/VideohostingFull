@@ -19,7 +19,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 
 //Настройка портов которые будет прослушивать сервер
-builder.WebHost.UseUrls("https://localhost:8080");
+builder.WebHost.UseUrls("http://localhost:8080");
 
 
 //builder.Services.AddScoped<какой тип просят, что вернуть>
@@ -31,7 +31,11 @@ builder.Services.AddSingleton(jwdSettings);
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IStorageService, StorageService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
+
+builder.Services.AddScoped<PosterService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
 {
@@ -59,7 +63,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.WithOrigins(allowedOrigins ?? new[] { "http://localhost:3000" })
+        policy.WithOrigins(allowedOrigins ?? new[] { "https://localhost:3000" })
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -119,7 +123,9 @@ async Task HandleException(HttpContext context)
 }
 
 //Настройка сервера
-app.UseHttpsRedirection();//Перенаправляет запросы полученные по http на порт с https
+//app.UseHttpsRedirection(); Это не нужно, поскольку сервер будет общаться с Nginx,
+//который будет обрабатывать HTTPS-соединения. Включение этого middleware может вызвать проблемы с перенаправлением,
+//так как Nginx уже обрабатывает SSL. Поэтому его следует отключить, чтобы избежать конфликтов и обеспечить корректную работу сервера за прокси.
 app.UseCors("FrontendPolicy");
 app.UseAuthentication();//Распознает пользователя, запускает контроллер с атрибутом [Authorize]  
 app.UseAuthorization();

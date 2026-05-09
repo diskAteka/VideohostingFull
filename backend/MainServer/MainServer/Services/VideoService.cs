@@ -21,7 +21,7 @@ namespace MainServer.Services
         private readonly ITokenService _tokenService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _environment;
-        private readonly IMinIOService _minIOService;
+        private readonly IStorageService _minIOService;
         private readonly IConfiguration _configuration;
 
         public VideoService(AppDbContext context, 
@@ -29,7 +29,7 @@ namespace MainServer.Services
             ITokenService tokenService, 
             IHttpContextAccessor httpContextAccessor,
             IWebHostEnvironment environment,
-            IMinIOService minIOService,
+            IStorageService minIOService,
             IConfiguration configuration)
         {
             _context = context;
@@ -380,7 +380,7 @@ namespace MainServer.Services
                 using (var stream = new FileStream(tempFilePath, FileMode.CreateNew))
                     await request.Video.CopyToAsync(stream);
 
-                Video newVideo = await _minIOService.UploadToMinIOAsync(request, AuthorId, tempFilePath);
+                Video newVideo = await _minIOService.UploadToStorageAsync(request, AuthorId, tempFilePath);
 
 
 
