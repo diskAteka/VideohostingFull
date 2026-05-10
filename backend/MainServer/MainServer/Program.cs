@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using SharedLib.Enums;
 using SharedLib.GlobalClasses;
@@ -27,12 +26,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString)
     .LogTo(Console.WriteLine, LogLevel.Information));
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton(jwdSettings);
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<IStorageService, StorageService>();
+builder.Services.AddScoped<IStorageService, StorageService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 
 builder.Services.AddScoped<PosterService>();
@@ -63,7 +63,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.WithOrigins(allowedOrigins ?? new[] { "https://localhost:3000" })
+        policy.WithOrigins(allowedOrigins ?? ["https://localhost:3000"])
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();

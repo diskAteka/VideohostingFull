@@ -1,15 +1,12 @@
-﻿using MainServer.Interfaces;
+﻿using Amazon.S3;
+using MainServer.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SharedLib.DTOmodels;
 using SharedLib.DTOmodels.RequestModel;
 using SharedLib.GlobalClasses;
 using SharedLib.GlobalInterfaces;
 using SharedLib.Models;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 
 namespace MainServer.Controllers
@@ -21,14 +18,21 @@ namespace MainServer.Controllers
         private readonly IVideoService _videoService;
         private readonly ILogger<VideoController> _logger;
         private readonly ITokenService _tokenService;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IStorageService _storageService;
 
-        public VideoController(IHttpClientFactory httpClientFactory, IVideoService videoService, ILogger<VideoController> logger, ITokenService tokenService)
+        private readonly string GarageEndpoint;
+        private readonly string _bucketName;
+
+        public VideoController(IVideoService videoService, 
+            ILogger<VideoController> logger, ITokenService tokenService, IConfiguration configuration,
+            IStorageService storageService)
         {
-            _httpClientFactory = httpClientFactory;
             _videoService = videoService;
             _logger = logger;
             _tokenService = tokenService;
+            _storageService = storageService;
+            GarageEndpoint = configuration["Garage:Endpoint"] ?? "";
+            _bucketName = configuration["Garage:BucketName"] ?? "";
         }
 
         [HttpGet]
@@ -142,40 +146,19 @@ namespace MainServer.Controllers
             try
             {
                 var video = await _videoService.GetVideoMetadataAsync(id);
-
                 if (video == null)
                     return NotFound("Видео не найдено");
 
-                if (!video.IsVerified) return Forbid();
-
-                string videoUrl = video.Link;
-
-                HttpClient client = _httpClientFactory.CreateClient();
-                var response = await client.GetAsync(videoUrl, HttpCompletionOption.ResponseHeadersRead);
-                if (!response.IsSuccessStatusCode)
-                    return NotFound("Файл с видео не найден");
-
-                var stream = await response.Content.ReadAsStreamAsync();
-
-                foreach ( var header in response.Headers)
-                    Response.Headers.TryAdd(header.Key, header.Value.ToArray());
-
-                foreach (var header in response.Content.Headers)
-                    Response.Headers.TryAdd(header.Key, header.Value.ToArray());
-
-                return File(stream, response.Content.Headers.ContentType?.MediaType ?? "video/mp4", enableRangeProcessing: true);
-            }
-            catch (ApiException ex)
-            {
-                _logger.LogError(ex, "Ошибка при стриминге видео");
-                return StatusCode(ApiException.GetStatusCode(ex.ErrorType), new { message = ex.Message });
+                var response = await _storageService.GetObjectAsync(_bucketName, video.Link);
+                return new FileStreamResult(response.ResponseStream, response.Headers.ContentType ?? "video/mp4")
+                {EnableRangeProcessing = true};
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Неожиданная ошибка при стриминге видео");
+                _logger.LogError(ex, "Ошибка при стриминге видео");
                 return StatusCode(500, new { message = "Внутренняя ошибка сервера" });
             }
-        }//Создает стриминговый поток
+        }
 
 
         [HttpPost("upload")]

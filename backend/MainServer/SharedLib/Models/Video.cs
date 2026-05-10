@@ -53,8 +53,8 @@ namespace SharedLib.Models
 
 
         // Вычисляемые свойства (не хранятся в БД)
-        public string VideoUrl => $"content/videos/{Link}";
-        public string PosterUrl => $"content/posters/{Poster}";
+        public string VideoUrl => $"{Link}";
+        public string PosterUrl => $"{Poster}";
 
     }
 }

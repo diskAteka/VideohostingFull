@@ -126,7 +126,7 @@ namespace MainServer.Services
                     IsDisLiked = isDisliked,
                     Comments = Comments,
 
-                    VideoUrl = $"{baseUrl}/{v.VideoUrl}",
+                    VideoUrl = $"/api/videos/{v.Id}/stream",
                     PosterUrl = $"{baseUrl}/{v.PosterUrl}"
 
                 };

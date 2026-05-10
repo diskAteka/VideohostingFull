@@ -234,18 +234,20 @@ function renderUserVideos() {
     }
 
     videosList.innerHTML = userVideos.map(video => {
-        // Определяем статус на основе isVerified (может быть true/false или undefined)
         const isVerified = video.isVerified === true;
         const statusClass = isVerified ? 'verified' : 'pending';
         const statusIcon = isVerified ? 'fa-check-circle' : 'fa-clock';
         const statusText = isVerified ? 'Опубликовано' : 'На проверке';
+        
+        const posterUrl = video.poster || '/content/posters/default.jpg';
 
         return `
             <div class="video-item" onclick="window.location.href='video.html?id=${video.id}'">
                 <div class="video-thumbnail">
-                    <img src="${video.poster || '/content/posters/default.jpg'}" 
+                    <img src="${posterUrl}" 
                          alt="${video.name}"
-                         onerror="this.src='/content/posters/default.jpg'">
+                         loading="lazy"
+                         onerror="this.onerror=null; this.src='/content/posters/default.jpg';">
                 </div>
                 <div class="video-item-info">
                     <h4 class="video-item-title">${video.name || 'Без названия'}</h4>

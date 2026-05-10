@@ -20,20 +20,18 @@ namespace MainServer.Services
         private readonly PosterService _posterService;
         private readonly ILogger<StorageService> _logger;
         private readonly IAmazonS3 _s3Client;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public StorageService(IConfiguration configuration, PosterService posterService, 
-            ILogger<StorageService> logger, IHttpContextAccessor httpContextAccessor)
+            ILogger<StorageService> logger)
         {
             _posterService = posterService;
             _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
-            AccessKey = configuration["Garage:AccessKey"];
-            AccessKeySecret = configuration["Garage:SecretKey"];
-            GarageEndpoint = configuration["Garage:Endpoint"];
-            _videoBasePath = configuration["Garage:VideoBasePath"];
-            _posterBasePath = configuration["Garage:PosterBasePath"];
-            _bucketName = configuration["Garage:BucketName"];
+            AccessKey = configuration["Garage:AccessKey"] ?? "";
+            AccessKeySecret = configuration["Garage:SecretKey"] ?? "";
+            GarageEndpoint = configuration["Garage:Endpoint"] ?? "";
+            _videoBasePath = configuration["Garage:VideoBasePath"] ?? "";
+            _posterBasePath = configuration["Garage:PosterBasePath"] ?? "";
+            _bucketName = configuration["Garage:BucketName"] ?? "";
             _tempPath = configuration["VideoStorage"] ?? "/MainServer/temp_videos";
 
             Directory.CreateDirectory(_tempPath);
@@ -44,8 +42,10 @@ namespace MainServer.Services
                 new AmazonS3Config
                 {
                     ServiceURL = GarageEndpoint,
+                    AuthenticationRegion = "garage",
                     ForcePathStyle = true,
                     MaxErrorRetry = 3,
+                    UseHttp = true,
                     Timeout = TimeSpan.FromSeconds(30)
                 });
             
@@ -87,8 +87,8 @@ namespace MainServer.Services
                 Name = request.Title,
                 Description = request.Description,
                 DateUpload = DateTime.UtcNow,
-                Link = BuildObjectUrl(videoObjectKey),
-                Poster = BuildObjectUrl(posterObjectKey),
+                Link = videoObjectKey,
+                Poster = posterObjectKey,
                 Likes = 0,
                 Dislikes = 0,
                 Views = 0,
@@ -106,7 +106,8 @@ namespace MainServer.Services
                 BucketName = _bucketName,
                 Key = objectKey,
                 FilePath = filePath,
-                ContentType = contentType
+                ContentType = contentType,
+                UseChunkEncoding = false
             };
 
             var response = await _s3Client.PutObjectAsync(request);
@@ -142,11 +143,7 @@ namespace MainServer.Services
 
         private string BuildObjectUrl(string objectKey)
         {
-            var request = _httpContextAccessor.HttpContext?.Request;
-            var baseUrl = $"{request.Scheme}://{request.Host}";
-
-            var encodedKey = Uri.EscapeDataString(objectKey);
-            return $"{baseUrl}/api/storage/file/{encodedKey}";
+            return $"{GarageEndpoint.TrimEnd('/')}/{_bucketName}/{objectKey}";
         }
 
         private string GetContentType(string extension)
@@ -164,6 +161,15 @@ namespace MainServer.Services
                 _ => "application/octet-stream"
             };
         }
+
+
+        public async Task<GetObjectResponse> GetObjectAsync(string bucketName, string url) 
+        {
+            var response = await _s3Client.GetObjectAsync(bucketName, url);
+            return response;
+        }
+
+
 
         public async Task DeleteVideoFilesAsync(string videoKey, string posterKey)
         {

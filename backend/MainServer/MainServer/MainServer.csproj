@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <None Remove="Recurce\placeholder-256.png" />
+    <None Remove="Recurce\placeholder.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Recurce\placeholder-256.png">
+    <Resource Include="Recurce\placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
